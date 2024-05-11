@@ -5,6 +5,7 @@ import { Apartment } from "./apartments.schema";
 import { ApartmentDTO } from "./apartments.dto";
 import { Response } from "express";
 import { QueryInterface } from "../Interfaces/QueryInterface";
+import { ApartmentStatusEnum } from "src/Enums/apartmentStatusEnum";
 
 @Injectable()
 export class ApartmentService {
@@ -12,7 +13,13 @@ export class ApartmentService {
 
   //Retrieve all apartments
   async getAllApartments(query: QueryInterface, res: Response) {
-    const filter = query.rooms ?  {rooms: query.rooms} : {};
+    let filter;
+    if (query.status){
+      filter = {status: query.status}
+    } else {
+      filter = query.rooms ?  {rooms: query.rooms} : {};
+      filter["status"] = ApartmentStatusEnum.vacant;
+    }
     const sort = {price: query.price as SortOrder || "desc" };
     const apartments = await this.apartmentsModel.find(filter).sort(sort).select("-__v").exec();
 
@@ -36,8 +43,8 @@ export class ApartmentService {
 
   //Add new apartment
   async createApartment(data: ApartmentDTO, res: Response): Promise<Response> {
-    const apartmentData = data;
-
+    const apartmentData = {status: ApartmentStatusEnum.vacant, ...data};
+    
     const apartmentCreated = await this.apartmentsModel.create(apartmentData);
 
     if (!apartmentCreated) {

@@ -1,31 +1,14 @@
-import { FormikProps } from "formik";
 import { FC, KeyboardEvent } from "react"
-import { ApartmentInterface } from "../../Interfaces";
 import { StyledApartmentFormCreateEdit } from "./ApartmentFormCreateEditStyled";
+import { FormProps } from "./ApartmentsFormCreateEditProps";
 
-interface FormProps {
-  formikProps: FormikProps<ApartmentInterface>;
-  setEditMode: React.Dispatch<React.SetStateAction<boolean>> | null;
-}
-
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export const ApartmentsFormCreateEdit: FC<FormProps> = (props) => {
   const formik = props.formikProps;
 
-  let numbers = []
-  for (let i = 1; i < 11; i++) {
-    numbers.push(i);
-  };
-
-  const invalidChars = [
-    "-",
-    "+",
-    "e",
-    ".",
-  ];
-
   const handleNumberInput = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (invalidChars.includes(e.key))
+    if (e.key.match(/^[.e+-]/))
       e.preventDefault();
   };
 

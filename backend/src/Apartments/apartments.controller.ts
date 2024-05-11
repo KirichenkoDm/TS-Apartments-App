@@ -1,8 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Res } from "@nestjs/common";
 import { ApartmentDTO } from "./apartments.dto";
-import { Response } from "express";
+import { Response, response } from "express";
 import { ApartmentService } from "./apartments.service";
 import { QueryInterface } from "../Interfaces/QueryInterface";
+import { ApartmentStatusEnum } from "src/Enums/apartmentStatusEnum";
+
+const ResponceInternalError = () => {
+  return response.status(500).json({
+    message: "Something went wrong",
+    error: "Internal server error",
+  });
+}
 
 @Controller("apartments")
 export class ApartmentController {
@@ -15,12 +23,16 @@ export class ApartmentController {
   ) {
     try {
       return response = await this.apartmentService.getAllApartments(query, response);
-    } catch (error) {
-      return response.status(500).json({
-        message: "Something went wrong",
-        error: "Internal server error",
-      });
-    }
+    } catch (error) { ResponceInternalError() }
+  }
+
+  @Get("/occupied")
+  async getOccupiedApartments(
+    @Res() response: Response,
+  ) {
+    try {
+      return response = await this.apartmentService.getAllApartments({status: ApartmentStatusEnum.occupied}, response);
+    } catch (error) { ResponceInternalError() }
   }
 
   @Get("/:id")
@@ -30,12 +42,7 @@ export class ApartmentController {
   ) {
     try {
       return response = await this.apartmentService.getApartmentById(apartmentId, response);
-    } catch (error) {
-      return response.status(500).json({
-        message: "Something went wrong",
-        error: "Internal server error",
-      });
-    }
+    } catch (error) { ResponceInternalError() }
   }
 
   @Post("")
@@ -45,12 +52,7 @@ export class ApartmentController {
   ) {
     try {
       return response = await this.apartmentService.createApartment(apattmentData, response);
-    } catch (error) {
-      return response.status(500).json({
-        message: "Something went wrong",
-        error: "Internal server error",
-      });
-    }
+    } catch (error) { ResponceInternalError() }
   }
 
   @Delete("/:id")
@@ -60,12 +62,7 @@ export class ApartmentController {
   ) {
     try {
       return response = await this.apartmentService.deleteApartmentById(apartmentId, response);
-    } catch (error) {
-      return response.status(500).json({
-        message: "Something went wrong",
-        error: "Internal server error",
-      });
-    }
+    } catch (error) { ResponceInternalError() }
   }
 
   @Put("/:id")
@@ -76,11 +73,17 @@ export class ApartmentController {
   ) {
     try {
       return response = await this.apartmentService.updateApartmentById(apartmentId, apartmentData, response);
-    } catch (error) {
-      return response.status(500).json({
-        message: "Something went wrong",
-        error: "Internal server error",
-      });
-    }
+    } catch (error) { ResponceInternalError() }
+  }
+
+  @Patch("/:id")
+  async changeStatusApartmentById(
+    @Res() response: Response,
+    @Param("id") apartmentId: string,
+    @Body() apartmentData
+  ) {
+    try {
+      return response = await this.apartmentService.updateApartmentById(apartmentId, apartmentData, response);
+    } catch (error) { ResponceInternalError() }
   }
 }

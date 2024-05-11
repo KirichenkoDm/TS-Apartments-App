@@ -1,30 +1,22 @@
 import styled from "styled-components";
 
-export const StyledCurrentApartment = styled.div`
+export const StyledCurrentApartment = styled.ul`
   width: 1000px;
-  padding: 20px;
-  border: 1px solid gray;
-  border-radius: 5px;
-  background-color: #FFFFFF;
-  
+
+  width: 1032px;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  align-items: flex-start;
-  gap: 7px;  
-  
-  span {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-  }
+  max-height: 500px;
+  padding-left: 16px;
 
-  h3 {
-    max-width: 70%; 
+  list-style-type: none;
+   overflow-y: auto; 
+  scrollbar-gutter: stable;
 
-  }
-
-  button {
-    align-self: flex-end;
-  }
+  li {
+    margin-bottom: 15px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+  }; 
 `

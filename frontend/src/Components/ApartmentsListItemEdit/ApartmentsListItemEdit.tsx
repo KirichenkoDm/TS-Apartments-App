@@ -4,17 +4,11 @@ import { editApartmentByIdThunk, getAllApartmentsThunk } from "../../Store/Apart
 import { ApartmentsFormCreateEdit } from "../ApartmentFormCreateEdit/";
 import { CreateEditFormValidation } from "../../Utils/CreateEditFormValidation";
 import { ApartmentInterface } from "../../Interfaces";
-import { useAppDispatch, useAppSelector } from "../../Store/hooks";
-import { setCurrentApartment } from "../../Store/Apartments/ApartmentsSlice";
-
-interface listItemProps {
-  apartmentData: ApartmentInterface
-  setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-}
+import { useAppDispatch } from "../../Store/hooks";
+import { listItemProps } from "./ApartmentsListItemEditProps";
 
 export const ApartmentsListItemEdit: FC<listItemProps> = (props) => {
   const dispatch = useAppDispatch();
-  const currentApartmentID = useAppSelector(state => state.apartments.currentApartment._id)
 
   const formik = useFormik({
     initialValues: {
@@ -31,10 +25,6 @@ export const ApartmentsListItemEdit: FC<listItemProps> = (props) => {
       await dispatch(getAllApartmentsThunk());
       await dispatch(editApartmentByIdThunk(values));
       await dispatch(getAllApartmentsThunk());
-      
-      // update current apartment if match
-      if (currentApartmentID === values._id)
-        await dispatch(setCurrentApartment(values));
       props.setEditMode(false);
     },
   });

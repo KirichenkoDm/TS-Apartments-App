@@ -15,7 +15,6 @@ export const ApartmentsList: FC = () => {
   useEffect(() => {
     dispatch(getAllApartmentsThunk());
   }, [dispatch, apartmentQuery]);
-
   return (
     <>
       <h2>Available apartments ({apartments.length})</h2>
@@ -27,11 +26,11 @@ export const ApartmentsList: FC = () => {
                 <h2>No Apartmens Match Querry.</h2>
                 :
                 apartments.map(
-                  (apartment: ApartmentInterface, i: number) =>
+                  (apartment: ApartmentInterface) =>
                     <ApartmentsListItem
                       key={apartment._id}
                       apartmentData={apartment}
-                      even={i % 2 === 0} />
+                      />
                 )
             }
           </ul>

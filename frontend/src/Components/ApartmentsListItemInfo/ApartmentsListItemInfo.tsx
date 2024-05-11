@@ -1,41 +1,39 @@
 import { FC, useState } from "react";
-import { ApartmentInterface } from "../../Interfaces";
-import { useAppDispatch, useAppSelector } from "../../Store/hooks";
-import { setCurrentApartment } from "../../Store/Apartments/ApartmentsSlice";
-import { deleteApartmentByIdThunk, getAllApartmentsThunk } from "../../Store/Apartments/ApartmentsApi";
+import { useAppDispatch } from "../../Store/hooks";
+import { 
+  changeStatusApartmentByIdThunk, 
+  deleteApartmentByIdThunk, 
+  getAllApartmentsThunk, 
+  getOccupiedApartmentsThunk 
+} from "../../Store/Apartments/ApartmentsApi";
 import { StyledApartmentsListItemInfo } from "./ApartmentsListItemInfoStyled";
-
-interface listItemProps {
-  apartmentData: ApartmentInterface
-  setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
-}
+import { ApartmentStatusEnum } from "../../Enums";
+import { listItemProps } from "./ApartmentsListItemInfoProps";
 
 export const ApartmentsListItemInfo: FC<listItemProps> = (props) => {
   const dispatch = useAppDispatch();
-  const currentApartmentID = useAppSelector(state => state.apartments.currentApartment._id)
   const [deleteSubmittion, setDeleteSubmittion] = useState(false);
   const handleChangeMode = () => {
-    props.setEditMode(true);
+    props.setEditMode!(true);
   };
 
-  const handleSelectApartment = () => {
-    dispatch(setCurrentApartment(props.apartmentData));
-  }
+  const handleSelectApartment = async () => {
+    let cancelApartmen = { ...props.apartmentData };
+    cancelApartmen.status = ApartmentStatusEnum.occupied;
+    await dispatch(changeStatusApartmentByIdThunk(cancelApartmen));
+    await dispatch(getOccupiedApartmentsThunk());
+    await dispatch(getAllApartmentsThunk());
+  };
 
-  const handleDelete = async () =>{
+  const handleDelete = async () => {
     if (deleteSubmittion) {
       await dispatch(deleteApartmentByIdThunk(props.apartmentData._id));
-
-      // clear current apartment if match
-      if (currentApartmentID === props.apartmentData._id)
-        await dispatch(setCurrentApartment({} as ApartmentInterface));
-
       await dispatch(getAllApartmentsThunk());
     } else {
       setDeleteSubmittion(true);
     }
   }
-  const handleDeny = () =>{
+  const handleDeny = () => {
     setDeleteSubmittion(false);
   }
 
@@ -49,15 +47,26 @@ export const ApartmentsListItemInfo: FC<listItemProps> = (props) => {
         <p>{`${props.apartmentData.description}`}</p>
       </div>
       <div className="list-item-controls">
-        <button onClick={handleChangeMode}>Edit</button>
-        <button onClick={handleSelectApartment}>Rent</button>
-        {deleteSubmittion? 
-        <div className="delete-confirmation">
-          <button onClick={handleDelete} className="button-red">Confirm</button>
-          <button onClick={handleDeny}>Cancel</button>
-        </div>
-        :
-        <button onClick={handleDelete} className="button-red">Delete</button>
+        {
+          props.CancelRent ?
+            <button
+              onClick={() => props.CancelRent!(props.apartmentData._id)!}
+              className="button-red">Cancel Rent
+            </button>
+            :
+            <>
+              <button onClick={handleChangeMode}>Edit</button>
+              <button onClick={handleSelectApartment}>Rent</button>
+              {
+                deleteSubmittion ?
+                  <div className="delete-confirmation">
+                    <button onClick={handleDelete} className="button-red">Confirm</button>
+                    <button onClick={handleDeny}>Cancel</button>
+                  </div>
+                  :
+                  <button onClick={handleDelete} className="button-red">Delete</button>
+              }
+            </>
         }
       </div>
     </StyledApartmentsListItemInfo>

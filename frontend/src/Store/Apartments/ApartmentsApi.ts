@@ -2,11 +2,11 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 import { RootState } from "../store";
 import { ApartmentInterface } from "../../Interfaces";
-import { BASE_URL } from "../../Utils/Constances";
+import { BASE_URL } from "../../Utils/Constants";
 
 export const getAllApartmentsThunk = createAsyncThunk(
   "apartments/getAll",
-  async (args, { getState }) => {
+  async (args, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState;
       //generate url
@@ -24,31 +24,31 @@ export const getAllApartmentsThunk = createAsyncThunk(
     } catch (err) {
       if (err instanceof AxiosError && err.response) {
         console.log(err.response.data.message);
+        return rejectWithValue(err.response.data.message);
       }
     }
-    return [];
+    return rejectWithValue("Apartment Api Error");
   });
 
-export const getApartmentByIdThunk = createAsyncThunk(
-  "apartments/getById",
-  async (args, { getState }) => {
+export const getOccupiedApartmentsThunk = createAsyncThunk(
+  "apartments/getOccupied",
+  async (args, {rejectWithValue} ) => {
     try {
-      const state = getState() as RootState;
       //generate url
-      let url = BASE_URL + state.apartments.currentApartment._id;
+      let url = BASE_URL + "/occupied";
 
       //send request
       const responce = await axios.get(url);
-
       //handle responce
-      return responce.data.apartment as ApartmentInterface;
+      return responce.data.apartments as ApartmentInterface[];
 
     } catch (err) {
       if (err instanceof AxiosError && err.response) {
         console.log(err.response.data.message);
+        return rejectWithValue(err.response.data.message);
       }
     }
-    return {} as ApartmentInterface;
+    return rejectWithValue("Apartment Api Error");
   });
 
 export const createApartmentThunk = createAsyncThunk(
@@ -77,7 +77,7 @@ export const editApartmentByIdThunk = createAsyncThunk(
   async (newData: ApartmentInterface) => {
     try {
       //generate url
-      let url = BASE_URL + newData._id;
+      let url = BASE_URL + "/" + newData._id;
 
       //send request
       const responce = await axios.put(url, newData);
@@ -97,7 +97,7 @@ export const deleteApartmentByIdThunk = createAsyncThunk(
   async (_id: string) => {
     try {
       //generate url
-      let url = BASE_URL + _id;
+      let url = BASE_URL + "/" + _id;
       const responce = await axios.delete(url);
 
       //handle responce
@@ -108,5 +108,25 @@ export const deleteApartmentByIdThunk = createAsyncThunk(
         console.log(err.response.data.message);
       }
     }
-    return []
   });
+
+export const changeStatusApartmentByIdThunk = createAsyncThunk(
+  "apartments/changeStatusById",
+  async (newData: ApartmentInterface) => {
+    try {
+      //generate url
+      let url = BASE_URL + "/" + newData._id;
+
+      //send request
+      const responce = await axios.patch(url, newData);
+
+      //handle responce
+      console.log(responce.data.message);
+
+    } catch (err) {
+      if (err instanceof AxiosError && err.response) {
+        console.log(err.response.data.message);
+      }
+    }
+  }
+)

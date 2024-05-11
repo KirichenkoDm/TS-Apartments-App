@@ -1,42 +1,53 @@
 import { FC, useEffect } from "react";
-import { selectMemorizedCurrentApartment, setCurrentApartment } from "../../Store/Apartments/ApartmentsSlice";
+import { selectCurrentApartments } from "../../Store/Apartments/ApartmentsSlice";
 import { useAppDispatch, useAppSelector } from "../../Store/hooks";
-import { getApartmentByIdThunk } from "../../Store/Apartments/ApartmentsApi";
-import { StyledCurrentApartment } from "./CurrentApartmentStyled";
+import { 
+  changeStatusApartmentByIdThunk, 
+  getAllApartmentsThunk, 
+  getOccupiedApartmentsThunk 
+} from "../../Store/Apartments/ApartmentsApi";
 import { ApartmentInterface } from "../../Interfaces";
+import { ApartmentsListItemInfo } from "../ApartmentsListItemInfo";
+import { StyledCurrentApartment } from "./CurrentApartmentStyled";
+import { ApartmentStatusEnum } from "../../Enums";
 
 export const CurrentApartment: FC = () => {
-  const apartment = useAppSelector(selectMemorizedCurrentApartment);
+  const apartments = useAppSelector(selectCurrentApartments);
   const dispatch = useAppDispatch();
 
-  const handleCancelCurrentApartment = () => {
-    dispatch(setCurrentApartment({} as ApartmentInterface))
+  const handleCancelCurrentApartment = async (id: string) => {
+    let cancelApartmen = {
+      ...apartments.find(obj => obj._id === id)
+    } as ApartmentInterface;
+    if (cancelApartmen) {
+      cancelApartmen.status = ApartmentStatusEnum.vacant;
+      await dispatch(changeStatusApartmentByIdThunk(cancelApartmen));
+      await dispatch(getOccupiedApartmentsThunk());
+      await dispatch(getAllApartmentsThunk());
+    } else console.log("Something went wrong");
   };
 
   useEffect(() => {
-    if (apartment._id && !apartment.name) {
-      dispatch(getApartmentByIdThunk());
-    }
-  });
-
+    dispatch(getOccupiedApartmentsThunk());
+  }, [dispatch]);
+  
   return (
     <>
       <h2>Your current rent</h2>
       <StyledCurrentApartment>
-
-        {apartment._id ?
-          <>
-            <span>
-              <h3>{`${apartment.name}`}</h3>
-              <h3>{`${apartment.rooms} Rooms, Rent: $${apartment.price}/month`}</h3>
-            </span>
-            <p>{`${apartment.description}`}</p>
-            <button 
-              onClick={handleCancelCurrentApartment}
-              className="button-red">Cancel Rent</button>
-          </>
-          :
-          <h3>No Current Apartment</h3>
+        {
+          !apartments.length ?
+            <h3>No current rent</h3>
+            :
+            apartments.map(
+              (apartment: ApartmentInterface) =>
+                <li key={apartment._id}><ApartmentsListItemInfo
+                  key={apartment._id}
+                  apartmentData={apartment}
+                  setEditMode={null}
+                  CancelRent={handleCancelCurrentApartment}
+                /></li>
+            )
         }
       </StyledCurrentApartment>
     </>

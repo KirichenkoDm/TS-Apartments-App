@@ -1,6 +1,5 @@
-import { PayloadAction, createSelector, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
-  ApartmentInterface,
   QueryParamsInterface,
   ApartmentSliceStateInterface
 } from "../../Interfaces";
@@ -10,25 +9,17 @@ import {
   deleteApartmentByIdThunk,
   editApartmentByIdThunk,
   getAllApartmentsThunk,
-  getApartmentByIdThunk
+  changeStatusApartmentByIdThunk,
+  getOccupiedApartmentsThunk
 } from "./ApartmentsApi";
-import { loadCurrentApartment } from "../../Utils/LocalStorage";
-
-export enum Status {
-  ready = "ready",
-  loading = "loading",
-  failed = "failed",
-}
+import { FetchStatusEnum } from "../../Enums";
 
 
 const initialState: ApartmentSliceStateInterface = {
   apartmentList: [],
   apartmentQuery: { filterRoomsNumber: 0, sortingDescending: true },
-  currentApartment:
-    { _id: loadCurrentApartment() } as ApartmentInterface
-    ||
-    {} as ApartmentInterface,
-  fetchStatus: Status.ready,
+  currentApartments: [],
+  fetchStatus: FetchStatusEnum.ready,
 };
 
 const apartmentsSlice = createSlice({
@@ -38,52 +29,52 @@ const apartmentsSlice = createSlice({
     setApartmentQuery: (state, action: PayloadAction<QueryParamsInterface>) => {
       state.apartmentQuery = action.payload;
     },
-    createNewApartment: (state, action: PayloadAction<ApartmentSliceStateInterface>) => {
-      return action.payload;
-    },
-    setCurrentApartment: (state, action: PayloadAction<ApartmentInterface>) => {
-      state.currentApartment = action.payload;
-    }
   },
   extraReducers: function (builder) {
     builder
       //get all
-      .addCase(getAllApartmentsThunk.pending, (state) => { state.fetchStatus = Status.loading; })
+      .addCase(getAllApartmentsThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
       .addCase(getAllApartmentsThunk.fulfilled, (state, action) => {
-        state.fetchStatus = Status.ready;
+        state.fetchStatus = FetchStatusEnum.ready;
         state.apartmentList = [...action.payload];
       })
-      .addCase(getAllApartmentsThunk.rejected, (state) => { state.fetchStatus = Status.failed; })
-      //get single(current)
-      .addCase(getApartmentByIdThunk.pending, (state) => { state.fetchStatus = Status.loading; })
-      .addCase(getApartmentByIdThunk.fulfilled, (state, action) => {
-        state.fetchStatus = Status.ready;
-        state.currentApartment = { ...action.payload };
+      .addCase(getAllApartmentsThunk.rejected, (state) => { 
+        state.fetchStatus = FetchStatusEnum.failed; 
+        state.apartmentList = [];
       })
-      .addCase(getApartmentByIdThunk.rejected, (state) => { state.fetchStatus = Status.failed; })
+      //get occupied(current)
+      .addCase(getOccupiedApartmentsThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
+      .addCase(getOccupiedApartmentsThunk.fulfilled, (state, action) => {
+        state.fetchStatus = FetchStatusEnum.ready;
+        state.currentApartments = [ ...action.payload ];
+      })
+      .addCase(getOccupiedApartmentsThunk.rejected, (state) => { 
+        state.fetchStatus = FetchStatusEnum.failed; 
+        state.currentApartments = [];
+      })
       //create
-      .addCase(createApartmentThunk.pending, (state) => { state.fetchStatus = Status.loading; })
-      .addCase(createApartmentThunk.fulfilled, (state) => { state.fetchStatus = Status.ready; })
-      .addCase(createApartmentThunk.rejected, (state) => { state.fetchStatus = Status.failed; })
+      .addCase(createApartmentThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
+      .addCase(createApartmentThunk.fulfilled, (state) => { state.fetchStatus = FetchStatusEnum.ready; })
+      .addCase(createApartmentThunk.rejected, (state) => { state.fetchStatus = FetchStatusEnum.failed; })
       //edit
-      .addCase(editApartmentByIdThunk.pending, (state) => { state.fetchStatus = Status.loading; })
-      .addCase(editApartmentByIdThunk.fulfilled, (state) => { state.fetchStatus = Status.ready; })
-      .addCase(editApartmentByIdThunk.rejected, (state) => { state.fetchStatus = Status.failed; })
+      .addCase(editApartmentByIdThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
+      .addCase(editApartmentByIdThunk.fulfilled, (state) => { state.fetchStatus = FetchStatusEnum.ready; })
+      .addCase(editApartmentByIdThunk.rejected, (state) => { state.fetchStatus = FetchStatusEnum.failed; })
       //delete
-      .addCase(deleteApartmentByIdThunk.pending, (state) => { state.fetchStatus = Status.loading; })
-      .addCase(deleteApartmentByIdThunk.fulfilled, (state) => { state.fetchStatus = Status.ready; })
-      .addCase(deleteApartmentByIdThunk.rejected, (state) => { state.fetchStatus = Status.failed; });
+      .addCase(deleteApartmentByIdThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
+      .addCase(deleteApartmentByIdThunk.fulfilled, (state) => { state.fetchStatus = FetchStatusEnum.ready; })
+      .addCase(deleteApartmentByIdThunk.rejected, (state) => { state.fetchStatus = FetchStatusEnum.failed; })
+      //change status 
+      .addCase(changeStatusApartmentByIdThunk.pending, (state) => { state.fetchStatus = FetchStatusEnum.loading; })
+      .addCase(changeStatusApartmentByIdThunk.fulfilled, (state) => { state.fetchStatus = FetchStatusEnum.ready; })
+      .addCase(changeStatusApartmentByIdThunk.rejected, (state) => { state.fetchStatus = FetchStatusEnum.failed; });
   }
 });
 
-export const { setApartmentQuery, createNewApartment, setCurrentApartment } = apartmentsSlice.actions;
+export const { setApartmentQuery } = apartmentsSlice.actions;
 export default apartmentsSlice.reducer;
 
 //apartments selectors
 export const selectAllApartments = (state: RootState) => state.apartments.apartmentList;
 export const selectApartmentQuery = (state: RootState) => state.apartments.apartmentQuery;
-//no reloading while changing something else in store
-export const selectMemorizedCurrentApartment = createSelector(
-  (state: RootState) => state.apartments.currentApartment,
-  (currentApartment) => currentApartment
-);
+export const selectCurrentApartments = (state: RootState) => state.apartments.currentApartments;

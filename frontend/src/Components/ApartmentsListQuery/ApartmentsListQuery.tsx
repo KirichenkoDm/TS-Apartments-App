@@ -1,4 +1,4 @@
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, KeyboardEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../Store/hooks";
 import { selectApartmentQuery, setApartmentQuery } from "../../Store/Apartments/ApartmentsSlice";
 import { StyledApartmentsListQuery } from "./ApartmentsListQueryStyled";
@@ -23,6 +23,11 @@ export const ApartmentsListQuery: FC = () => {
     }));
   };
 
+  const handleNumberInput = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key.match(/^[.e+-]/))
+      e.preventDefault();
+  };
+
   return (
     <StyledApartmentsListQuery>
       <label>
@@ -31,10 +36,11 @@ export const ApartmentsListQuery: FC = () => {
           type='number'
           min="0"
           max="10"
-          value={ apartmentQuery.filterRoomsNumber > 0 ?
+          value={apartmentQuery.filterRoomsNumber > 0 ?
             apartmentQuery.filterRoomsNumber
             :
-            "" }
+            ""}
+          onKeyDown={handleNumberInput}
           onChange={handleFilterRooms}
         ></input>
       </label>
@@ -42,7 +48,7 @@ export const ApartmentsListQuery: FC = () => {
         Sort by:
         <select onChange={handleInvertSorting}>
           <option key="desc" value={"desc"}>Price - highest to lowest</option>
-          <option key="asc" value={"asc"}>Price - lowest to highest</option>          
+          <option key="asc" value={"asc"}>Price - lowest to highest</option>
         </select>
       </label>
     </StyledApartmentsListQuery>
