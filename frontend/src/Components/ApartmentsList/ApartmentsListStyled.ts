@@ -2,16 +2,12 @@ import styled from "styled-components";
 
 export const StyledApartmentsList = styled.div`
 
-  width: 1032px;
+  width: 1000px;
   display: flex;
   flex-direction: column;
-  max-height: 500px;
-  padding-left: 16px;
 
   ul {
     list-style-type: none;
-    overflow-y: auto; 
-    scrollbar-gutter: stable;
   };
 
   li {
