@@ -28,7 +28,7 @@ export const CreateNewApartment: FC = () => {
 
   return (
   <>
-    <h2>Create a new rent</h2>
+    <h2>🤑Create a new rent</h2>
     <ApartmentsFormCreateEdit formikProps={formik} setEditMode={null}/>
   </>
   );

@@ -17,13 +17,13 @@ export const ApartmentsList: FC = () => {
   }, [dispatch, apartmentQuery]);
   return (
     <>
-      <h2>Available apartments ({apartments.length})</h2>
+      <h2>🏡Available apartments ({apartments.length})</h2>
       <StyledApartmentsList>
           <ApartmentsListQuery />
           <ul>
             {
               !apartments.length ?
-                <h2>No Apartmens Match Querry.</h2>
+                <h2>No Apartmens Match Querry😞</h2>
                 :
                 apartments.map(
                   (apartment: ApartmentInterface) =>

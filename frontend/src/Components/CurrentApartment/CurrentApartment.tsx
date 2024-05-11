@@ -33,11 +33,11 @@ export const CurrentApartment: FC = () => {
   
   return (
     <>
-      <h2>Your current rent</h2>
+      <h2>🤩Your current rent</h2>
       <StyledCurrentApartment>
         {
           !apartments.length ?
-            <h3>No current rent</h3>
+            <h3>No current rent😞</h3>
             :
             apartments.map(
               (apartment: ApartmentInterface) =>
