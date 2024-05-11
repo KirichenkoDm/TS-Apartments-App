@@ -2,7 +2,7 @@ import { FC, KeyboardEvent } from "react"
 import { StyledApartmentFormCreateEdit } from "./ApartmentFormCreateEditStyled";
 import { FormProps } from "./ApartmentsFormCreateEditProps";
 
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const roomNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export const ApartmentsFormCreateEdit: FC<FormProps> = (props) => {
   const formik = props.formikProps;
@@ -47,7 +47,7 @@ export const ApartmentsFormCreateEdit: FC<FormProps> = (props) => {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
             >
-              {numbers.map((i) => <option key={i} value={i}>{i}</option>)}
+              {roomNumbers.map((i) => <option key={i} value={i}>{i}</option>)}
             </select>
           </label>
           <label>
