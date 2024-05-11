@@ -8,7 +8,7 @@
 ### `npm i`
 ### `npm start`
 
-## For backend
+## For frontend
 ### `cd frontend`
 ### `npm i`
 ### `npm start`
