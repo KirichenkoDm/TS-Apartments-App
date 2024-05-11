@@ -7,10 +7,10 @@
 ### `npm i`
 ### `npm start`
 &nbsp;
-## For backend
+## For frontend
 ### `cd frontend`
 ### `npm i`
 ### `npm start`
 &nbsp;
 ### Database stands on MongoDB Atlas cloud solution;
-#### Connection string located in backedn/.env file
+#### Connection string located in backend/.env file
